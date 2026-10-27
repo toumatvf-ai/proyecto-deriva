@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+    <nav th:fragment="topbar" class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-cube" style="color: var(--primary-green);"></i>
+            3A COMPANY S.A.C.
+        </div>
+        <div class="navbar-user">
+            <div class="user-info" sec:authorize="isAuthenticated()">
+                <div class="user-avatar" th:text="${#strings.substring(#authentication.principal.fullName,0,1)}">U</div>
+                <div>
+                    <strong th:text="${#authentication.principal.fullName}">Usuario</strong><br>
+                    <small style="color: var(--text-muted);" th:text="${#authentication.principal.authorities[0].authority}">Rol</small>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </form>
+        </div>
+    </nav>
+</body>
+</html>

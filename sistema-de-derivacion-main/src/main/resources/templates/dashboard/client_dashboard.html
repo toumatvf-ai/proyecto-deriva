@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Reclamos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: topbar}"></div>
+
+<div class="main-container">
+    <div class="page-header">
+        <div>
+            <h1>Mis Reclamos Corporativos</h1>
+            <p>Monitorea en tiempo real el estado y la resolución de tus incidencias.</p>
+        </div>
+        <a th:href="@{/incident/new}" class="btn-primary-action">
+            <i class="fas fa-plus"></i> Crear Nuevo Reclamo
+        </a>
+    </div>
+
+    <div class="card-table">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Título de Incidencia</th>
+                    <th>Empresa</th>
+                    <th>Estado</th>
+                    <th>Fecha Registro</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="incident : ${incidents}">
+                    <td th:text="${incident.code != null ? incident.code : '#' + incident.incidentId}" style="font-weight: 700; color: var(--primary-blue);"></td>
+                    <td th:text="${incident.title}" style="font-weight: 600;"></td>
+                    <td th:text="${incident.company.legalName}"></td>
+                    <td>
+                        <span class="badge-status" 
+                            th:classappend="${'bg-' + incident.incidentStatus.name.toLowerCase().replace(' ', '')}">
+                            <i class="fas fa-circle" style="font-size: 6px;"></i>
+                            <span th:text="${incident.incidentStatus.name}"></span>
+                        </span>
+                    </td>
+                    <td th:text="${#temporals.format(incident.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/incident/{id}(id=${incident.incidentId})}" class="btn-action">
+                            <i class="far fa-eye"></i> Ver Detalle
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(incidents)}">
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                        <i class="far fa-folder-open" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                        No tienes reclamos registrados en este momento.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Operaciones - 3A COMPANY S.A.C.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .dashboard-header { border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; margin-bottom: 20px; }
+        .title-highlight { color: #a855f7; font-weight: 800; text-transform: uppercase; }
+        .subtitle { color: #7f8c8d; margin-top: -10px; font-size: 0.95em; }
+        
+        /* Colores dinámicos para la prioridad */
+        .priority-critica { color: #dc2626; font-weight: 700; background: #fef2f2; padding: 4px 8px; border-radius: 6px; border: 1px solid #fecaca; font-size: 0.75rem; }
+        .priority-alta { color: #ea580c; font-weight: 700; background: #fff7ed; padding: 4px 8px; border-radius: 6px; border: 1px solid #ffedd5; font-size: 0.75rem; }
+        .priority-media { color: #ca8a04; font-weight: 700; background: #fef9c3; padding: 4px 8px; border-radius: 6px; border: 1px solid #fef08a; font-size: 0.75rem; }
+        .priority-baja { color: #16a34a; font-weight: 700; background: #f0fdf4; padding: 4px 8px; border-radius: 6px; border: 1px solid #bbf7d0; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: topbar}"></div>
+
+<div class="main-container">
+    
+    <div class="dashboard-header">
+        <h1 th:if="${departmentName != null}">
+            Área de <span class="title-highlight" th:text="${departmentName}"></span>
+        </h1>
+        <p class="subtitle" th:if="${departmentName != null}">
+            Incidencias derivadas a tu departamento.
+        </p>
+
+        <h1 th:if="${departmentName == null}">
+            Panel Técnico <span style="color: #ef4444;">(Sin Área Asignada)</span>
+        </h1>
+    </div>
+
+    <div th:if="${errorMsg}" class="alert-box alert-danger" th:text="${errorMsg}"></div>
+
+    <div class="card-table" th:if="${errorMsg == null}">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Prioridad</th>
+                    <th>Título de la Incidencia</th>
+                    <th>Asesor Derivador</th>
+                    <th>Estado</th>
+                    <th>Última Actualización</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="incident : ${incidents}">
+                    <!-- Código en lugar de ID -->
+                    <td th:text="${incident.code != null ? incident.code : '#' + incident.incidentId}" style="font-weight: 700; color: var(--primary-blue);"></td>
+                    
+                    <!-- Prioridad con colores dinámicos -->
+                    <td>
+                        <span th:if="${incident.priority == 'CRITICA'}" class="priority-critica"><i class="fas fa-exclamation-triangle"></i> CRÍTICA</span>
+                        <span th:if="${incident.priority == 'ALTA'}" class="priority-alta"><i class="fas fa-arrow-up"></i> ALTA</span>
+                        <span th:if="${incident.priority == 'MEDIA'}" class="priority-media"><i class="fas fa-minus"></i> MEDIA</span>
+                        <span th:if="${incident.priority == 'BAJA'}" class="priority-baja"><i class="fas fa-arrow-down"></i> BAJA</span>
+                        <span th:if="${incident.priority == null}" style="color: var(--text-muted); font-size: 0.75rem;">NO DEFINIDA</span>
+                    </td>
+
+                    <td th:text="${incident.title}" style="font-weight: 600;"></td>
+                    <td th:text="${incident.advisor != null ? incident.advisor.firstName + ' ' + incident.advisor.lastName : 'N/A'}"></td>
+                    <td>
+                        <span class="badge-status" 
+                              th:classappend="${'bg-' + incident.incidentStatus.name.toLowerCase().replace(' ', '')}">
+                            <i class="fas fa-circle" style="font-size: 6px;"></i>
+                            <span th:text="${incident.incidentStatus.name}"></span>
+                        </span>
+                    </td>
+                    <td th:text="${#temporals.format(incident.updatedAt, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/incident/{id}(id=${incident.incidentId})}" 
+                        class="btn-action"
+                        th:text="${(incident.incidentStatus.name == 'Solucionado' or incident.incidentStatus.name == 'Rechazado') ? 'Ver Detalle' : 'Atender'}">
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(incidents)}">
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                        <i class="far fa-folder-open" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                        No hay reclamos asignados a tu área en este momento.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

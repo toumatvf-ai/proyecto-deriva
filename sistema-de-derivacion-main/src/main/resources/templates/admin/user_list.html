@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Usuarios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: topbar}"></div>
+
+<div class="main-container">
+    <div style="margin-bottom: 20px;">
+        <a th:href="@{/admin/dashboard}" class="btn-action"><i class="fas fa-arrow-left"></i> Volver al Panel</a>
+    </div>
+
+    <div class="page-header">
+        <div>
+            <h1>Gestión de Usuarios y Roles</h1>
+            <p>Administra los accesos del personal interno y clientes.</p>
+        </div>
+        <a th:href="@{/admin/users/new}" class="btn-primary-action" style="background: #3b82f6;">
+            <i class="fas fa-user-plus"></i> Nuevo Usuario
+        </a>
+    </div>
+
+    <div th:if="${successMsg}" class="alert-box alert-success" style="background: #dcfce7; color: #166534; border: 1px solid #bbf7d0;" th:text="${successMsg}"></div>
+    <div th:if="${errorMsg}" class="alert-box alert-danger" th:text="${errorMsg}"></div>
+
+    <div class="card-table">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Completo</th>
+                    <th>Correo</th>
+                    <th>Roles</th>
+                    <th>Área</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.userAccountId}"></td>
+                    <td th:text="${user.firstName + ' ' + user.lastName}" style="font-weight: 600;"></td>
+                    <td th:text="${user.email}"></td>
+                    <td>
+                        <span th:each="role : ${user.roles}" class="badge-status" style="background: #f1f5f9; color: #475569; margin-right: 4px;" th:text="${role.name}"></span>
+                    </td>
+                    <td th:text="${user.department != null ? user.department.name : '-'}"></td>
+                    <td>
+                        <span class="badge-status" th:classappend="${user.isActive ? 'bg-solucionado' : 'bg-rechazado'}" th:text="${user.isActive ? 'Activo' : 'Inactivo'}"></span>
+                    </td>
+                    <td style="display: flex; gap: 8px;">
+                        <a th:href="@{/admin/users/edit/{id}(id=${user.userAccountId})}" class="btn-action" style="background: #e0f2fe; color: #0369a1;"><i class="fas fa-edit"></i> Editar</a>
+                        <form th:action="@{/admin/users/toggle/{id}(id=${user.userAccountId})}" method="post" style="margin: 0;">
+                            <button type="submit" class="btn-action" th:style="${user.isActive ? 'background: #fee2e2; color: #991b1b;' : 'background: #dcfce7; color: #166534;'}">
+                                <i th:class="${user.isActive ? 'fas fa-ban' : 'fas fa-check'}"></i>
+                                <span th:text="${user.isActive ? 'Desactivar' : 'Activar'}"></span>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

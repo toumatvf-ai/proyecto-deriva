@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Reclamo - 3A COMPANY S.A.C.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: topbar}"></div>
+
+<div class="main-container" style="max-width: 900px;">
+    
+    <div style="margin-bottom: 20px;">
+        <button onclick="history.back()" class="btn-action"><i class="fas fa-arrow-left"></i> Volver al Panel</button>
+    </div>
+
+    <div class="card-table" style="padding: 25px; margin-bottom: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div>
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;" th:text="'INCIDENCIA ' + ${incident.code != null ? incident.code : '#' + incident.incidentId}"></span>
+                <h2 style="margin: 5px 0; font-size: 1.3rem; color: #0f172a;" th:text="${incident.title}"></h2>
+            </div>
+            <span class="badge-status" th:classappend="${'bg-' + incident.incidentStatus.name.toLowerCase().replace(' ', '')}">
+                <i class="fas fa-circle" style="font-size: 6px;"></i>
+                <span th:text="${incident.incidentStatus.name}"></span>
+            </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; font-size: 0.875rem;">
+            <div><strong>Cliente:</strong> <br><span th:text="${incident.client.firstName + ' ' + incident.client.lastName}"></span></div>
+            <div><strong>Empresa:</strong> <br><span th:text="${incident.company.legalName}"></span></div>
+            <div><strong>Prioridad:</strong> <br><span th:text="${incident.priority != null ? incident.priority : 'No definida'}"></span></div>
+            <div><strong>Área Asignada:</strong> <br><span th:text="${incident.department != null ? incident.department.name : 'Aún sin asignar'}"></span></div>
+            <div><strong>Técnico Asignado:</strong> <br><span th:text="${incident.assignedTo != null ? incident.assignedTo.firstName + ' ' + incident.assignedTo.lastName : 'Aún sin asignar'}"></span></div>
+        </div>
+
+        <div style="margin-top: 15px; font-size: 0.9rem;">
+            <strong>Descripción del Problema:</strong>
+            <p style="color: var(--text-muted); margin-top: 5px;" th:text="${incident.description}"></p>
+        </div>
+
+        <div th:if="${incident.photoUrl != null and incident.photoUrl != ''}" style="margin-top: 15px;">
+            <strong>Foto/Evidencia Adjunta:</strong><br>
+            <img th:src="${incident.photoUrl}" style="max-width: 100%; max-height: 250px; border-radius: 8px; margin-top: 8px; border: 1px solid var(--border-color);" alt="Evidencia">
+        </div>
+    </div>
+
+    <!-- ACCIÓN ASESOR -->
+    <div th:if="${#lists.contains(roles, 'ASESOR') and incident.incidentStatus.name == 'Pendiente'}" 
+        class="card-table" style="padding: 25px; margin-bottom: 25px; border-left: 4px solid #f97316;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: #c2410c;"><i class="fas fa-headset"></i> Acción del Asesor: Evaluar Incidencia</h3>
+        
+        <form id="advisorForm" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Prioridad <small>(Solo para derivar)</small></label>
+                    <select name="priority" id="prioritySelect" class="form-control">
+                        <option value="BAJA">Baja</option>
+                        <option value="MEDIA" selected>Media</option>
+                        <option value="ALTA">Alta</option>
+                        <option value="CRITICA">Crítica</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Área de Destino <small>(Solo para derivar)</small></label>
+                    <select name="departmentId" id="deptSelect" class="form-control" onchange="filterTechnicians()">
+                        <option value="">-- Seleccione Área --</option>
+                        <option th:each="dept : ${departments}" th:value="${dept.departmentId}" th:text="${dept.name}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Técnico Asignado <small>(Solo para derivar)</small></label>
+                    <select name="technicianId" id="techSelect" class="form-control">
+                        <option value="">-- Seleccione Técnico --</option>
+                        <option th:each="tech : ${technicians}" 
+                                th:value="${tech.userAccountId}" 
+                                th:data-dept="${tech.department != null ? tech.department.departmentId : ''}"
+                                th:text="${tech.firstName + ' ' + tech.lastName}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Comentario / Motivo de Rechazo (Obligatorio)</label>
+                <textarea name="comment" id="advisorComment" class="form-control" style="height: 80px;" required placeholder="Escriba las instrucciones para el técnico o el motivo por el cual se rechaza el reclamo..."></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button type="button" onclick="submitAdvisorForm('route')" class="btn-primary-action" style="background: #f97316;">
+                    <i class="fas fa-share"></i> Derivar Incidencia
+                </button>
+                
+                <button type="button" onclick="submitAdvisorForm('reject')" class="btn-primary-action" style="background: #ef4444;">
+                    <i class="fas fa-ban"></i> Rechazar Incidencia
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ACCIONES TÉCNICO -->
+    <div th:if="${#lists.contains(roles, 'TECNICO') and incident.incidentStatus.name == 'Asignado'}" 
+        class="card-table" style="padding: 25px; margin-bottom: 25px; border-left: 4px solid #3b82f6;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: #1e40af;"><i class="fas fa-play"></i> Iniciar Atención de Incidencia</h3>
+        <form th:action="@{/incident/{id}/start(id=${incident.incidentId})}" method="post">
+            <button type="submit" class="btn-primary-action" style="background: #3b82f6;">Marcar como "En Proceso"</button>
+        </form>
+    </div>
+
+    <div th:if="${#lists.contains(roles, 'TECNICO') and incident.incidentStatus.name == 'En Proceso'}" 
+        class="card-table" style="padding: 25px; margin-bottom: 25px; border-left: 4px solid var(--primary-green);">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: #166534;"><i class="fas fa-check-circle"></i> Registrar Solución Final</h3>
+        <form th:action="@{/incident/{id}/resolve(id=${incident.incidentId})}" method="post">
+            <div class="form-group">
+                <label>Explicación de la Solución (Obligatorio)</label>
+                <textarea name="resolutionComment" class="form-control" style="padding-left: 14px; height: 90px;" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>URL de Evidencia de Solución (Opcional)</label>
+                <input type="url" name="evidenceUrl" class="form-control" style="padding-left: 14px;" placeholder="https://ejemplo.com/solucion.jpg">
+            </div>
+            <button type="submit" class="btn-primary-action">Marcar como "Solucionado"</button>
+        </form>
+    </div>
+
+    <h3 style="font-size: 1.1rem; color: #0f172a; margin-bottom: 15px;"><i class="fas fa-history"></i> Línea de Tiempo y Trazabilidad</h3>
+    <div class="timeline-wrapper">
+        <div class="timeline-event" th:each="hist : ${history}">
+            <div class="timeline-time" th:text="${#temporals.format(hist.createdAt, 'dd/MM/yyyy hh:mm a')}"></div>
+            <div class="timeline-body">
+                <strong th:text="${hist.actionUser.firstName + ' ' + hist.actionUser.lastName}"></strong> 
+                <span style="color: var(--text-muted); font-size: 0.8rem;">cambió el estado:</span> 
+                <span style="font-weight: 600;" th:text="${hist.previousStatus != null ? hist.previousStatus.name : 'Inicio'}"></span> 
+                &rarr; 
+                <span style="font-weight: 600; color: var(--primary-green);" th:text="${hist.newStatus.name}"></span>
+                
+                <p th:if="${hist.commentText != null}" style="margin: 8px 0 0 0; font-size: 0.85rem; color: #334155;" th:text="${hist.commentText}"></p>
+                <div th:if="${hist.evidenceUrl != null and hist.evidenceUrl != ''}" style="margin-top: 8px;">
+                    <a th:href="${hist.evidenceUrl}" target="_blank" style="font-size: 0.8rem; color: var(--primary-blue);"><i class="fas fa-paperclip"></i> Ver Evidencia Adjunta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function filterTechnicians() {
+        var deptId = document.getElementById("deptSelect").value;
+        var techSelect = document.getElementById("techSelect");
+        var options = techSelect.getElementsByTagName("option");
+        
+        techSelect.value = ""; 
+        for (var i = 1; i < options.length; i++) {
+            if (options[i].getAttribute("data-dept") === deptId) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    }
+
+    function submitAdvisorForm(actionType) {
+        var form = document.getElementById('advisorForm');
+        var deptSelect = document.getElementById('deptSelect');
+        var techSelect = document.getElementById('techSelect');
+        var comment = document.getElementById('advisorComment');
+        
+        if (comment.value.trim() === '') {
+            alert('Por favor, ingrese un comentario o motivo.');
+            comment.focus();
+            return;
+        }
+
+        if (actionType === 'route') {
+            if (deptSelect.value === '' || techSelect.value === '') {
+                alert('Para derivar, debe seleccionar un Área y un Técnico.');
+                return;
+            }
+            form.action = '/incident/[[${incident.incidentId}]]/route';
+        } else if (actionType === 'reject') {
+            if (!confirm('¿Está seguro que desea RECHAZAR este reclamo? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            form.action = '/incident/[[${incident.incidentId}]]/reject';
+            deptSelect.required = false;
+            techSelect.required = false;
+        }
+        
+        form.submit();
+    }
+</script>
+
+</body>
+</html>

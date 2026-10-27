@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección de Perfil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        
+        <div class="auth-header">
+            <div class="badge-company">
+                <div class="badge-dot"></div>
+                3A COMPANY S.A.C.
+            </div>
+            <div class="brand-logo-circle">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h1>¡Hola, <span th:text="${fullName}"></span>!</h1>
+            <p>Tu cuenta cuenta con múltiples perfiles. Selecciona el panel al que deseas ingresar:</p>
+        </div>
+
+        <div class="role-options-list">
+            
+            <a th:if="${#lists.contains(roles.![authority], 'CLIENTE')}" th:href="@{/dashboard/client}" class="role-card">
+                <div class="role-icon cliente"><i class="fas fa-building"></i></div>
+                <div class="role-details">
+                    <h3>Portal de Cliente</h3>
+                    <p>Registra y monitorea tus reclamos corporativos.</p>
+                </div>
+                <i class="fas fa-chevron-right role-arrow"></i>
+            </a>
+
+            <a th:if="${#lists.contains(roles.![authority], 'ASESOR')}" th:href="@{/dashboard/advisor}" class="role-card">
+                <div class="role-icon asesor"><i class="fas fa-headset"></i></div>
+                <div class="role-details">
+                    <h3>Panel de Asesoría</h3>
+                    <p>Evalúa y deriva incidencias hacia las áreas internas.</p>
+                </div>
+                <i class="fas fa-chevron-right role-arrow"></i>
+            </a>
+
+            <a th:if="${#lists.contains(roles.![authority], 'TECNICO')}" th:href="@{/dashboard/technician}" class="role-card">
+                <div class="role-icon tecnico"><i class="fas fa-microchip"></i></div>
+                <div class="role-details">
+                    <h3>Centro de Operaciones</h3>
+                    <p>Atiende y resuelve reclamos asignados a tu área.</p>
+                </div>
+                <i class="fas fa-chevron-right role-arrow"></i>
+            </a>
+
+            <a th:if="${#lists.contains(roles.![authority], 'ADMINISTRADOR')}" th:href="@{/admin/dashboard}" class="role-card">
+                <div class="role-icon" style="background: #f1f5f9; color: #0f172a;"><i class="fas fa-cogs"></i></div>
+                <div class="role-details">
+                    <h3>Administración</h3>
+                    <p>Gestión de reportes y exportación de datos.</p>
+                </div>
+                <i class="fas fa-chevron-right role-arrow"></i>
+            </a>
+
+        </div>
+
+        <div style="text-align: center;">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn-logout-link">
+                    <i class="fas fa-sign-out-alt"></i> Salir de la cuenta
+                </button>
+            </form>
+        </div>
+
+    </div>
+    <div class="system-footer">
+        <i class="fas fa-shield-alt"></i> Canal Oficial • 3A COMPANY S.A.C.
+    </div>
+</div>
+
+</body>
+</html>

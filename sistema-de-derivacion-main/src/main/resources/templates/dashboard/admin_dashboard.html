@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    
+<div th:replace="~{fragments/navbar :: topbar}"></div>
+
+<div class="main-container">
+    <div class="page-header">
+        <div>
+            <h1>Panel de Administración General</h1>
+            <p>Gestión de reportes, usuarios y roles del sistema.</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <!-- Tarjeta de Exportación -->
+        <div class="card-table" style="padding: 30px; text-align: center;">
+            <i class="fas fa-file-excel" style="font-size: 4rem; color: #10b981; margin-bottom: 20px;"></i>
+            <h2>Exportar Reporte</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Descarga la base de datos completa de reclamos en formato Excel (.xlsx).</p>
+            <a th:href="@{/admin/export/incidents}" class="btn-primary-action">
+                <i class="fas fa-download"></i> Descargar Excel
+            </a>
+        </div>
+
+        <!-- Tarjeta de Gestión de Usuarios -->
+        <div class="card-table" style="padding: 30px; text-align: center;">
+            <i class="fas fa-users-cog" style="font-size: 4rem; color: #3b82f6; margin-bottom: 20px;"></i>
+            <h2>Gestión de Usuarios</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Crea, edita y administra los roles y accesos del personal interno.</p>
+            <a th:href="@{/admin/users}" class="btn-primary-action" style="background: #3b82f6;">
+                <i class="fas fa-users"></i> Administrar Usuarios
+            </a>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

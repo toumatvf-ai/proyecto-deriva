@@ -1,0 +1,24 @@
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+.container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+h1, h2, h3 { color: #2c3e50; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+th { background-color: #2c3e50; color: white; }
+tr:hover { background-color: #f1f1f1; }
+.btn { display: inline-block; padding: 10px 15px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; }
+.btn:hover { background-color: #2980b9; }
+.btn-success { background-color: #2ecc71; }
+.btn-success:hover { background-color: #27ae60; }
+.badge { padding: 5px 10px; border-radius: 15px; font-size: 0.85em; font-weight: bold; color: white; }
+.bg-pendiente { background-color: #f1c40f; color: #333; }
+.bg-asignado { background-color: #3498db; }
+.bg-proceso { background-color: #e67e22; }
+.bg-solucionado { background-color: #2ecc71; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+.form-control { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+.timeline { border-left: 3px solid #3498db; padding-left: 20px; margin-top: 20px; }
+.timeline-item { margin-bottom: 20px; position: relative; }
+.timeline-item::before { content: ''; position: absolute; left: -27px; top: 0; width: 11px; height: 11px; background: #3498db; border-radius: 50%; border: 3px solid #fff; }
+.timeline-date { font-size: 0.85em; color: #7f8c8d; }
+.evidence-img { max-width: 300px; margin-top: 10px; border-radius: 5px; border: 1px solid #ddd; }

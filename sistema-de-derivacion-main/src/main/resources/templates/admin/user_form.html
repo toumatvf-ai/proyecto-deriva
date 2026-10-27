@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Usuario - 3A COMPANY S.A.C.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: topbar}"></div>
+
+<div class="main-container" style="max-width: 800px;">
+    <div style="margin-bottom: 20px;">
+        <a th:href="@{/admin/users}" class="btn-action"><i class="fas fa-arrow-left"></i> Volver a la Lista</a>
+    </div>
+
+    <div class="page-header">
+        <h1 th:text="${user.userAccountId == null ? 'Crear Nuevo Usuario' : 'Editar Usuario'}"></h1>
+    </div>
+
+    <div class="card-table" style="padding: 30px;">
+        <form th:action="@{/admin/users/save}" method="post">
+            <input type="hidden" name="userAccountId" th:value="${user.userAccountId}">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>Nombres</label>
+                    <input type="text" name="firstName" class="form-control" th:value="${user.firstName}" required>
+                </div>
+                <div class="form-group">
+                    <label>Apellidos</label>
+                    <input type="text" name="lastName" class="form-control" th:value="${user.lastName}" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" name="email" class="form-control" th:value="${user.email}" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="text" name="phone" class="form-control" th:value="${user.phoneNumber}">
+                </div>
+                <div class="form-group">
+                    <label>Contraseña <small th:if="${user.userAccountId != null}" style="color: var(--text-muted);">(Dejar en blanco para no cambiar)</small></label>
+                    <input type="password" name="password" class="form-control" th:required="${user.userAccountId == null}">
+                </div>
+                <div class="form-group">
+                    <label>Área / Departamento <small style="color: var(--text-muted);">(Solo para Técnicos)</small></label>
+                    <select name="departmentId" class="form-control">
+                        <option value="">-- Ninguno --</option>
+                        <option th:each="dept : ${departments}" 
+                                th:value="${dept.departmentId}" 
+                                th:text="${dept.name}"
+                                th:selected="${user.department != null and user.department.departmentId == dept.departmentId}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+                <label>Roles del Usuario (Seleccione al menos uno)</label>
+                <div style="display: flex; gap: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <label th:each="role : ${roles}" style="display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer;">
+                        <input type="checkbox" name="roleIds" th:value="${role.roleId}" 
+                            th:checked="${user.roles != null and #lists.contains(user.roles, role)}" style="width: 18px; height: 18px;">
+                        <span th:text="${role.name}"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                <a th:href="@{/admin/users}" class="btn-action" style="padding: 12px 20px;">Cancelar</a>
+                <button type="submit" class="btn-primary-action" style="background: #3b82f6; padding: 12px 24px;"><i class="fas fa-save"></i> Guardar Usuario</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

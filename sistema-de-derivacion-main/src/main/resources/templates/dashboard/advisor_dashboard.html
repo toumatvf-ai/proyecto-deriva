@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Asesoría - 3A COMPANY S.A.C.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: topbar}"></div>
+
+<div class="main-container">
+    <div class="page-header">
+        <div>
+            <h1>Reclamos Pendientes de Derivación</h1>
+            <p>Evalúa las solicitudes de clientes y asígnalas al departamento correspondiente.</p>
+        </div>
+    </div>
+
+    <div class="card-table">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Cliente Solicitante</th>
+                    <th>Título del Reclamo</th>
+                    <th>Estado</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="incident : ${incidents}">
+                    <!-- CAMBIO APLICADO: Mostrar Código en lugar de ID -->
+                    <td th:text="${incident.code != null ? incident.code : '#' + incident.incidentId}" style="font-weight: 700; color: var(--primary-blue);"></td>
+                    
+                    <td th:text="${incident.client.firstName + ' ' + incident.client.lastName}"></td>
+                    <td th:text="${incident.title}" style="font-weight: 600;"></td>
+                    <td>
+                        <span class="badge-status bg-pendiente">
+                            <i class="fas fa-clock"></i> Pendiente
+                        </span>
+                    </td>
+                    <td th:text="${#temporals.format(incident.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/incident/{id}(id=${incident.incidentId})}" class="btn-action" style="background: #fff7ed; color: #c2410c;">
+                            <i class="fas fa-filter"></i> Evaluar y Derivar
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(incidents)}">
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--primary-green); margin-bottom: 10px; display: block;"></i>
+                        ¡Excelente! No hay reclamos pendientes por derivar en este momento.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
